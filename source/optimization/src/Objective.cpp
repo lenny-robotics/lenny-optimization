@@ -33,6 +33,10 @@ bool Objective::testHessian(const Eigen::VectorXd& x) const {
     return testMatrix(eval, anal, x, "Hessian", x.size(), useFullHessian);
 }
 
+bool Objective::preValueEvaluation(const Eigen::VectorXd& x) const {
+    return true;
+}
+
 void Objective::drawGui() {
     using tools::Gui;
     if (Gui::I->TreeNode(description.c_str())) {

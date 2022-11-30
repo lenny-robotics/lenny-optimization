@@ -19,8 +19,8 @@ bool NewtonOptimizer::optimize(Eigen::VectorXd& x, const Objective& objective, u
         computeSearchDirection(searchDir, x, objective);
 
         if (printInfos)
-            LENNY_LOG_PRINT(tools::Logger::DEFAULT, "[%s] (Objective value: %10.10lf. Gradient norm: %10.10lf. Dot product: %10.10lf): ", description.c_str(), objectiveValue,
-                            gradientNorm, dotProduct)
+            LENNY_LOG_PRINT(tools::Logger::DEFAULT, "[%s] (Objective value: %10.10lf. Gradient norm: %10.10lf. Dot product: %10.10lf): ", description.c_str(),
+                            objectiveValue, gradientNorm, dotProduct)
 
         //Check convergence
         if (gradientNorm < solverResidual) {
@@ -114,11 +114,11 @@ bool NewtonOptimizer::applyLineSearch(Eigen::VectorXd& x, const Eigen::VectorXd&
         const Eigen::VectorXd x_new = x - searchDir * alpha;
 
         //Compute new objective value
-        objective.preValueEvaluation(x_new);
+        const bool success = objective.preValueEvaluation(x_new);
         const double newObjectiveValue = objective.computeValue(x_new);
 
         //If not satisfying, try again with updated alpha
-        if (newObjectiveValue > this->objectiveValue) {
+        if (!success || newObjectiveValue > this->objectiveValue) {
             alpha *= lineSearchMultiplicationFactor;
         } else {  //If satisfied, update values and return
             x = x_new;

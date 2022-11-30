@@ -32,7 +32,7 @@ public:
     virtual bool testHessian(const Eigen::VectorXd& x) const;
 
     //--- Solver
-    virtual void preValueEvaluation(const Eigen::VectorXd& x) const {}
+    virtual bool preValueEvaluation(const Eigen::VectorXd& x) const;  //Return false if we should move on with line search
     virtual void preDerivativeEvaluation(const Eigen::VectorXd& x) const {}
 
     //--- Gui

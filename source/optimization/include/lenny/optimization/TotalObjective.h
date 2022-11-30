@@ -23,7 +23,7 @@ public:
     virtual void preFDEvaluation(const Eigen::VectorXd& x) const override;
 
     //--- Solver
-    virtual void preValueEvaluation(const Eigen::VectorXd& x) const override;
+    virtual bool preValueEvaluation(const Eigen::VectorXd& x) const override;
     virtual void preDerivativeEvaluation(const Eigen::VectorXd& x) const override;
 
     //--- Constraints

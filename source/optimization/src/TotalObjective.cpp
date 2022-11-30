@@ -90,9 +90,12 @@ void TotalObjective::preFDEvaluation(const Eigen::VectorXd& x) const {
         objective->preFDEvaluation(x);
 }
 
-void TotalObjective::preValueEvaluation(const Eigen::VectorXd& x) const {
+bool TotalObjective::preValueEvaluation(const Eigen::VectorXd& x) const {
+    bool success = true;
     for (const auto& [objective, weight] : subObjectives)
-        objective->preValueEvaluation(x);
+        if (!objective->preValueEvaluation(x))
+            success = false;
+    return success;
 }
 
 void TotalObjective::preDerivativeEvaluation(const Eigen::VectorXd& x) const {
