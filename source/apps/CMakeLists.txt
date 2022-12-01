@@ -1,14 +1,13 @@
 project(Tests)
 
 file(GLOB sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
         )
 
 add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME}
-        PUBLIC optimization
+        PUBLIC lenny::optimization
         )
 
 target_include_directories(${PROJECT_NAME}
