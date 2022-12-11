@@ -57,6 +57,7 @@ bool Constraint::checkConstraintSatisfaction(const Eigen::VectorXd& x) const {
         if (checkPassed)
             LENNY_LOG_PRINT(Logger::GREEN, "\tPASSED\n");
         LENNY_LOG_PRINT(Logger::DEFAULT, "End of check -> %s\n", description.c_str());
+        LENNY_LOG_PRINT(Logger::MAGENTA, "-------------------------------------------------------------\n");
     }
 
     return checkPassed;
