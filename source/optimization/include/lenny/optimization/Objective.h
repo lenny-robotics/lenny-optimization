@@ -29,6 +29,10 @@ public:
     virtual bool testGradient(const Eigen::VectorXd& x) const;
     virtual bool testHessian(const Eigen::VectorXd& x) const;
 
+    //--- Finite difference
+    virtual void preFDEvaluation(const Eigen::VectorXd& x) const {}
+    virtual void setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const;
+
     //--- Solver
     virtual bool preValueEvaluation(const Eigen::VectorXd& x) const;  //Return false if we should move on with line search
     virtual void preDerivativeEvaluation(const Eigen::VectorXd& x) const {}
@@ -43,6 +47,8 @@ public:
     std::string description;    //Set by constructor
     const bool useFullHessian;  //Set by constructor
     tools::FiniteDifference fd;
+
+protected:
     mutable bool fdCheckIsBeingApplied = false;
 };
 

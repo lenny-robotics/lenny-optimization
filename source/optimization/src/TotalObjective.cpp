@@ -6,14 +6,8 @@
 
 namespace lenny::optimization {
 
-TotalObjective::TotalObjective(const std::string& description, const double& regularizerWeight) : Objective(description), regularizerWeight(regularizerWeight) {
-    //Set finite difference pre-evaluation function
-    fd.f_PreEval = [&](const Eigen::VectorXd& x) -> void {
-        for (const auto& [objective, weight] : subObjectives)
-            if (objective->fd.f_PreEval)
-                objective->fd.f_PreEval(x);
-    };
-}
+TotalObjective::TotalObjective(const std::string& description, const double& regularizerWeight)
+    : Objective(description), regularizerWeight(regularizerWeight) {}
 
 double TotalObjective::computeValue(const Eigen::VectorXd& x) const {
     double value = 0.0;
@@ -85,34 +79,27 @@ bool TotalObjective::testIndividualSecondDerivatives(const Eigen::VectorXd& x) c
     return testSuccessful;
 }
 
-bool TotalObjective::testGradient(const Eigen::VectorXd& x) const {
+void TotalObjective::preFDEvaluation(const Eigen::VectorXd& x) const {
     for (auto& [objective, weight] : subObjectives)
-        objective->fdCheckIsBeingApplied = true;
-    const bool successful = Objective::testGradient(x);
-    for (auto& [objective, weight] : subObjectives)
-        objective->fdCheckIsBeingApplied = false;
-    return successful;
+        objective->preFDEvaluation(x);
 }
 
-bool TotalObjective::testHessian(const Eigen::VectorXd& x) const {
+void TotalObjective::setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const {
+    fdCheckIsBeingApplied = checkIsBeingApplied;
     for (auto& [objective, weight] : subObjectives)
-        objective->fdCheckIsBeingApplied = true;
-    const bool successful = Objective::testHessian(x);
-    for (auto& [objective, weight] : subObjectives)
-        objective->fdCheckIsBeingApplied = false;
-    return successful;
+        objective->setFDCheckIsBeingApplied(checkIsBeingApplied);
 }
 
 bool TotalObjective::preValueEvaluation(const Eigen::VectorXd& x) const {
     bool success = true;
-    for (const auto& [objective, weight] : subObjectives)
+    for (auto& [objective, weight] : subObjectives)
         if (!objective->preValueEvaluation(x))
             success = false;
     return success;
 }
 
 void TotalObjective::preDerivativeEvaluation(const Eigen::VectorXd& x) const {
-    for (const auto& [objective, weight] : subObjectives)
+    for (auto& [objective, weight] : subObjectives)
         objective->preDerivativeEvaluation(x);
 }
 
