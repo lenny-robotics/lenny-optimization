@@ -18,6 +18,8 @@ public:
     //--- Tests
     virtual bool testIndividualFirstDerivatives(const Eigen::VectorXd& x) const;
     virtual bool testIndividualSecondDerivatives(const Eigen::VectorXd& x) const;
+    virtual bool testGradient(const Eigen::VectorXd& x) const;
+    virtual bool testHessian(const Eigen::VectorXd& x) const;
 
     //--- Solver
     virtual bool preValueEvaluation(const Eigen::VectorXd& x) const override;

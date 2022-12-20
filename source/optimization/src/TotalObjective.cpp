@@ -85,6 +85,24 @@ bool TotalObjective::testIndividualSecondDerivatives(const Eigen::VectorXd& x) c
     return testSuccessful;
 }
 
+bool TotalObjective::testGradient(const Eigen::VectorXd& x) const {
+    for (auto& [objective, weight] : subObjectives)
+        objective->fdCheckIsBeingApplied = true;
+    const bool successful = Objective::testGradient(x);
+    for (auto& [objective, weight] : subObjectives)
+        objective->fdCheckIsBeingApplied = false;
+    return successful;
+}
+
+bool TotalObjective::testHessian(const Eigen::VectorXd& x) const {
+    for (auto& [objective, weight] : subObjectives)
+        objective->fdCheckIsBeingApplied = true;
+    const bool successful = Objective::testHessian(x);
+    for (auto& [objective, weight] : subObjectives)
+        objective->fdCheckIsBeingApplied = false;
+    return successful;
+}
+
 bool TotalObjective::preValueEvaluation(const Eigen::VectorXd& x) const {
     bool success = true;
     for (const auto& [objective, weight] : subObjectives)
