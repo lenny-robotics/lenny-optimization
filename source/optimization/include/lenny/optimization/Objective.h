@@ -1,19 +1,17 @@
 #pragma once
 
 #include <lenny/tools/FiniteDifference.h>
-
-#include <memory>
+#include <lenny/tools/Typedefs.h>
 
 namespace lenny::optimization {
 
-class Objective : public tools::FiniteDifference {
+class Objective {
 public:
-    //--- Pointers
-    typedef std::unique_ptr<Objective> UPtr;
-    typedef std::shared_ptr<Objective> SPtr;
+    //--- Typedefs
+    LENNY_GENERAGE_TYPEDEFS(Objective)
 
     //--- Constructor
-    Objective(const std::string& description, const bool useFullHessian = false);
+    Objective(const std::string& description, const bool& useFullHessian = false);
     virtual ~Objective() = default;
 
     //--- Evaluation
@@ -31,6 +29,10 @@ public:
     virtual bool testGradient(const Eigen::VectorXd& x) const;
     virtual bool testHessian(const Eigen::VectorXd& x) const;
 
+    //--- Finite difference
+    virtual void preFDEvaluation(const Eigen::VectorXd& x) const {}
+    virtual void setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const;
+
     //--- Solver
     virtual bool preValueEvaluation(const Eigen::VectorXd& x) const;  //Return false if we should move on with line search
     virtual void preDerivativeEvaluation(const Eigen::VectorXd& x) const {}
@@ -42,7 +44,12 @@ protected:
     virtual void drawGuiContent() {}
 
 public:
+    std::string description;    //Set by constructor
     const bool useFullHessian;  //Set by constructor
+    tools::FiniteDifference fd;
+
+protected:
+    mutable bool fdCheckIsBeingApplied = false;
 };
 
 }  // namespace lenny::optimization

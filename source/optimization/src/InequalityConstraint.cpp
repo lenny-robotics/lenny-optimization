@@ -9,9 +9,10 @@ InequalityConstraint::InequalityConstraint(const std::string& description) : Con
 double InequalityConstraint::computeValue(const Eigen::VectorXd& x) const {
     Eigen::VectorXd C;
     computeConstraint(C, x);
+    checkSoftificationWeights();
     double value = 0.0;
     for (uint i = 0; i < C.size(); i++)
-        value += barrier.computeValue(C[i]);
+        value += softificationWeights[i] * barrier.computeValue(C[i]);
     return value;
 }
 
@@ -22,10 +23,11 @@ void InequalityConstraint::computeGradient(Eigen::VectorXd& pVpX, const Eigen::V
     Eigen::SparseMatrixD pCpX;
     computeJacobian(pCpX, x);
 
+    checkSoftificationWeights();
     pVpX.resize(x.size());
     pVpX.setZero();
     for (uint i = 0; i < C.size(); i++)
-        pVpX += barrier.computeFirstDerivative(C[i]) * pCpX.row(i);
+        pVpX += softificationWeights[i] * barrier.computeFirstDerivative(C[i]) * pCpX.row(i);
 }
 
 void InequalityConstraint::computeHessian(Eigen::SparseMatrixD& p2VpX2, const Eigen::VectorXd& x) const {
@@ -35,9 +37,10 @@ void InequalityConstraint::computeHessian(Eigen::SparseMatrixD& p2VpX2, const Ei
     Eigen::SparseMatrixD pCpX;
     computeJacobian(pCpX, x);
 
+    checkSoftificationWeights();
     Eigen::TripletDList p2BpX2_entries;
     for (uint i = 0; i < C.size(); i++)
-        tools::utils::addTripletDToList(p2BpX2_entries, i, i, barrier.computeSecondDerivative(C[i]));
+        tools::utils::addTripletDToList(p2BpX2_entries, i, i, softificationWeights[i] * barrier.computeSecondDerivative(C[i]));
     Eigen::SparseMatrixD p2BpX2(C.size(), C.size());
     p2BpX2.setFromTriplets(p2BpX2_entries.begin(), p2BpX2_entries.end());
 
@@ -52,7 +55,7 @@ void InequalityConstraint::computeHessian(Eigen::SparseMatrixD& p2VpX2, const Ei
         if (p2CpX2.getNumberOfEntries() > 0) {
             Eigen::VectorXd pBpX(C.size());
             for (uint i = 0; i < C.size(); i++)
-                pBpX[i] = barrier.computeFirstDerivative(C[i]);
+                pBpX[i] = softificationWeights[i] * barrier.computeFirstDerivative(C[i]);
 
             Eigen::SparseMatrixD mat;
             p2CpX2.multiply(mat, pBpX);

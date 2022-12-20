@@ -79,38 +79,41 @@ bool TotalObjective::testIndividualSecondDerivatives(const Eigen::VectorXd& x) c
     return testSuccessful;
 }
 
-void TotalObjective::setFDCheckIsBeingApplied(bool isBeingApplied) const {
-    for (const auto& [objective, weight] : subObjectives)
-        objective->setFDCheckIsBeingApplied(isBeingApplied);
-    this->fdCheckIsBeingApplied = isBeingApplied;
+void TotalObjective::preFDEvaluation(const Eigen::VectorXd& x) const {
+    for (auto& [objective, weight] : subObjectives)
+        objective->preFDEvaluation(x);
 }
 
-void TotalObjective::preFDEvaluation(const Eigen::VectorXd& x) const {
-    for (const auto& [objective, weight] : subObjectives)
-        objective->preFDEvaluation(x);
+void TotalObjective::setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const {
+    fdCheckIsBeingApplied = checkIsBeingApplied;
+    for (auto& [objective, weight] : subObjectives)
+        objective->setFDCheckIsBeingApplied(checkIsBeingApplied);
 }
 
 bool TotalObjective::preValueEvaluation(const Eigen::VectorXd& x) const {
     bool success = true;
-    for (const auto& [objective, weight] : subObjectives)
+    for (auto& [objective, weight] : subObjectives)
         if (!objective->preValueEvaluation(x))
             success = false;
     return success;
 }
 
 void TotalObjective::preDerivativeEvaluation(const Eigen::VectorXd& x) const {
-    for (const auto& [objective, weight] : subObjectives)
+    for (auto& [objective, weight] : subObjectives)
         objective->preDerivativeEvaluation(x);
 }
 
 bool TotalObjective::checkConstraintSatisfaction(const Eigen::VectorXd& x) const {
     bool checkPassed = true;
     for (const auto& [objective, weight] : subObjectives) {
+        std::vector<uint> indices;
         if (const InequalityConstraint* iec = dynamic_cast<InequalityConstraint*>(objective.get())) {
-            if (!iec->checkConstraintSatisfaction(x))
+            iec->checkConstraintSatisfaction(indices, x, true);
+            if (indices.size() > 0)
                 checkPassed = false;
         } else if (const EqualityConstraint* ec = dynamic_cast<EqualityConstraint*>(objective.get())) {
-            if (!ec->checkConstraintSatisfaction(x))
+            ec->checkConstraintSatisfaction(indices, x, true);
+            if (indices.size() > 0)
                 checkPassed = false;
         }
     }
