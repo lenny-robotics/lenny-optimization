@@ -1,2 +1,2 @@
 # lenny-tools
-fetch_lenny_repository(tools softification-weights)
+fetch_lenny_repository(tools master)
