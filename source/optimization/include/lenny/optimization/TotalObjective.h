@@ -20,8 +20,8 @@ public:
     virtual bool testIndividualSecondDerivatives(const Eigen::VectorXd& x) const;
 
     //--- Finite difference
-    virtual void preFDEvaluation(const Eigen::VectorXd& x) const;
-    virtual void setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const;
+    virtual void preFDEvaluation(const Eigen::VectorXd& x) const override;
+    virtual void setFDCheckIsBeingApplied(const bool& checkIsBeingApplied) const override;
 
     //--- Solver
     virtual bool preValueEvaluation(const Eigen::VectorXd& x) const override;
