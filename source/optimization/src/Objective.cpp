@@ -3,7 +3,7 @@
 
 namespace lenny::optimization {
 
-Objective::Objective(const std::string& description, const bool useFullHessian) : tools::FiniteDifference(description), useFullHessian(useFullHessian) {}
+Objective::Objective(const std::string& description, const bool& useFullHessian) : description(description), useFullHessian(useFullHessian), fd(description) {}
 
 void Objective::computeHessian(Eigen::MatrixXd& p2VpX2, const Eigen::VectorXd& x) const {
     Eigen::SparseMatrixD p2VpX2_sparse;
@@ -13,24 +13,30 @@ void Objective::computeHessian(Eigen::MatrixXd& p2VpX2, const Eigen::VectorXd& x
 
 void Objective::estimateGradient(Eigen::VectorXd& pVpX, const Eigen::VectorXd& x) const {
     auto eval = [&](const Eigen::VectorXd& x) -> double { return computeValue(x); };
-    estimateVector(pVpX, x, eval);
+    fd.estimateVector(pVpX, x, eval);
 }
 
 void Objective::estimateHessian(Eigen::SparseMatrixD& p2VpX2, const Eigen::VectorXd& x) const {
     auto eval = [&](Eigen::VectorXd& vec, const Eigen::VectorXd& x) -> void { computeGradient(vec, x); };
-    estimateMatrix(p2VpX2, x, eval, x.size(), useFullHessian);
+    fd.estimateMatrix(p2VpX2, x, eval, x.size(), useFullHessian);
 }
 
 bool Objective::testGradient(const Eigen::VectorXd& x) const {
+    fdCheckIsBeingApplied = true;
     auto eval = [&](const Eigen::VectorXd& x) -> double { return computeValue(x); };
     auto anal = [&](Eigen::VectorXd& vec, const Eigen::VectorXd& x) -> void { computeGradient(vec, x); };
-    return testVector(eval, anal, x, "Gradient");
+    const bool successful = fd.testVector(eval, anal, x, "Gradient");
+    fdCheckIsBeingApplied = false;
+    return successful;
 }
 
 bool Objective::testHessian(const Eigen::VectorXd& x) const {
+    fdCheckIsBeingApplied = true;
     auto eval = [&](Eigen::VectorXd& vec, const Eigen::VectorXd& x) -> void { computeGradient(vec, x); };
     auto anal = [&](Eigen::SparseMatrixD& sMat, const Eigen::VectorXd& x) -> void { computeHessian(sMat, x); };
-    return testMatrix(eval, anal, x, "Hessian", x.size(), useFullHessian);
+    const bool successful = fd.testMatrix(eval, anal, x, "Hessian", x.size(), useFullHessian);
+    fdCheckIsBeingApplied = false;
+    return successful;
 }
 
 bool Objective::preValueEvaluation(const Eigen::VectorXd& x) const {

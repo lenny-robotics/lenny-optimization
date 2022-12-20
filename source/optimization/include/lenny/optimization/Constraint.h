@@ -24,8 +24,11 @@ public:
     virtual bool testJacobian(const Eigen::VectorXd& x) const;
     virtual bool testTensor(const Eigen::VectorXd& x) const;
 
-    //--- Check
-    virtual bool checkConstraintSatisfaction(const Eigen::VectorXd& x) const;
+    //--- Check (returns indices with violated constraints)
+    virtual void checkConstraintSatisfaction(std::vector<uint>& indices, const Eigen::VectorXd& x, const bool& print) const;
+
+    //--- Helpers
+    void checkSoftificationWeights() const;
 
 protected:
     //--- Constraint check helper
@@ -37,7 +40,7 @@ protected:
 public:
     double constraintCheckTolerance;  //Set by constructor
     bool useTensorForHessian = true;
-    bool printConstraintSatisfactionCheck = true;
+    mutable Eigen::VectorXd softificationWeights;
 };
 
 }  // namespace lenny::optimization
