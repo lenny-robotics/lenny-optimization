@@ -20,8 +20,8 @@ file(MAKE_DIRECTORY "logs")
 # CXX standard
 set(CMAKE_CXX_STANDARD 20)
 
-# External code
-add_subdirectory(external)
+# Fetch lenny repository
+fetch_lenny_repository(tools master)
 
 # Source code
 add_subdirectory(source)
