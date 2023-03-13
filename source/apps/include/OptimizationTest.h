@@ -1,5 +1,6 @@
 #pragma once
 
+#include <gtest/gtest.h>
 #include <lenny/optimization/EqualityConstraint.h>
 #include <lenny/optimization/InequalityConstraint.h>
 #include <lenny/optimization/NewtonOptimizer.h>
@@ -97,18 +98,18 @@ public:
 
 }  // namespace test
 
-void applyOptimizationTest() {
+TEST(optimization, test) {
     Eigen::VectorXd x = Eigen::VectorXd::Random(2);
     test::TotalTestObjective totalObjective;
     lenny::optimization::NewtonOptimizer optimizer("TestOptimizer");
 
-    totalObjective.testIndividualFirstDerivatives(x);
-    totalObjective.testIndividualSecondDerivatives(x);
+    EXPECT_TRUE(totalObjective.testIndividualFirstDerivatives(x));
+    EXPECT_TRUE(totalObjective.testIndividualSecondDerivatives(x));
 
-    totalObjective.testGradient(x);
-    totalObjective.testHessian(x);
+    EXPECT_TRUE(totalObjective.testGradient(x));
+    EXPECT_TRUE(totalObjective.testHessian(x));
 
-    totalObjective.checkConstraintSatisfaction(x);
+    EXPECT_FALSE(totalObjective.checkConstraintSatisfaction(x));
 
     optimizer.checkHessianProperties = true;
     optimizer.checkLinearSystemSolve = true;

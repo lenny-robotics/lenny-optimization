@@ -1,6 +1,6 @@
 #include "OptimizationTest.h"
 
 int main() {
-    applyOptimizationTest();
-    return 0;
+    testing::InitGoogleTest();
+    return RUN_ALL_TESTS();
 }

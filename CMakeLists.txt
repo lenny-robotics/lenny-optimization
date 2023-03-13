@@ -14,6 +14,9 @@ option(${LENNY_PROJECT}_BUILD_APPS "Build apps" ON)
 # Project folder path
 set(LENNY_PROJECT_FOLDER "\"${CMAKE_CURRENT_LIST_DIR}\"" CACHE STRING "")
 
+# Include CTest (needs to be in "root" CMakeLists!)
+include(CTest)
+
 # Generate log directory
 file(MAKE_DIRECTORY "logs")
 
